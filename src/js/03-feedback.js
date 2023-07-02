@@ -1,35 +1,34 @@
 import throttle from 'lodash.throttle';
 
 const STORAGE_KEY = 'feedback-form-state';
-const form = document.querySelector('.feedback-form');
+const formEl = document.querySelector('.feedback-form');
+let dataForm = {};
 
-form.addEventListener('input', throttle(onInputData, 500));
-form.addEventListener('submit', onFormSubmit);
+formEl.addEventListener('input', throttle(onInputData, 500));
+formEl.addEventListener('submit', onFormSubmit);
 
-let dataForm = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-const { email, message } = form.elements;
-reloadPage();
+const onLoad = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return;
+    dataForm = JSON.parse(data);
+    Object.entries(dataForm).forEach(([key, val]) => {
+      formEl.elements[key].value = val;
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+window.addEventListener('load', onLoad);
 
 function onInputData(evt) {
-  dataForm = { email: email.value, message: message.value };
+  dataForm[evt.target.name] = evt.target.value.trim();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(dataForm));
-}
-
-function reloadPage() {
-  if (dataForm) {
-    email.value = dataForm.email || '';
-    message.value = dataForm.message || '';
-  }
 }
 
 function onFormSubmit(evt) {
   evt.preventDefault();
-  console.log({ email: email.value, message: message.value });
-
-  if (email.value === '' || message.value === '') {
-    return alert('Please fill in all fields.');
-  }
-
+  console.log(dataForm);
   localStorage.removeItem(STORAGE_KEY);
   evt.currentTarget.reset();
   dataForm = {};

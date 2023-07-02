@@ -11,9 +11,9 @@ const player = new Player(iframe, {
 });
 const getCurrentTime = function (currentTime) {
   const seconds = currentTime.seconds;
-  localStorage.setItem(CURRENT_TIME_KEY, JSON.stringify(seconds));
+  localStorage.setItem(CURRENT_TIME_KEY, seconds);
 };
 
 player.on('timeupdate', throttle(getCurrentTime, 1000));
 
-player.setCurrentTime(JSON.parse(localStorage.getItem(CURRENT_TIME_KEY)) || 0);
+player.setCurrentTime(localStorage.getItem(CURRENT_TIME_KEY) || 0);
